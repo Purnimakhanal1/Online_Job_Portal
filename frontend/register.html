@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobPortal | Register</title>
+  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/auth.css">
+</head>
+<body>
+  <div id="topNav"></div>
+  <main class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-xl-8 col-lg-10">
+        <section class="card shadow-sm border-0">
+          <div class="card-body p-4">
+            <h1 class="h3 mb-3">Create Account</h1>
+            <div id="authAlert"></div>
+            <form id="registerForm" class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="role">Role</label>
+                <select id="role" class="form-select" required>
+                  <option value="job_seeker">Job Seeker</option>
+                  <option value="employer">Employer</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="full_name">Full Name</label>
+                <input id="full_name" class="form-control" type="text" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="email">Email</label>
+                <input id="email" class="form-control" type="email" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="password">Password</label>
+                <input id="password" class="form-control" type="password" minlength="4" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="phone">Phone</label>
+                <input id="phone" class="form-control" type="text">
+              </div>
+
+              <div id="jobSeekerFields" class="col-12 rounded-3 p-3 border seeker-employer-box">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="skills">Skills</label>
+                    <input id="skills" class="form-control" type="text">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label" for="experience_years">Experience Years</label>
+                    <input id="experience_years" class="form-control" type="number" min="0">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label" for="education">Education</label>
+                    <input id="education" class="form-control" type="text">
+                  </div>
+                </div>
+              </div>
+
+              <div id="employerFields" class="col-12 rounded-3 p-3 border seeker-employer-box">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="company_name">Company Name</label>
+                    <input id="company_name" class="form-control" type="text">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="company_website">Company Website</label>
+                    <input id="company_website" class="form-control" type="url">
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 d-grid">
+                <button class="btn btn-primary" type="submit">Register</button>
+              </div>
+            </form>
+            <p class="text-secondary mt-3 mb-0">Already have an account? <a href="login.html">Login</a></p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/common.js"></script>
+  <script src="../assets/js/auth.js"></script>
+</body>
+</html>

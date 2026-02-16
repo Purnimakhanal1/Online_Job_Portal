@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobPortal | Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <div id="topNav"></div>
+  <main class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+      <div>
+        <h1 class="h3 mb-1">Dashboard</h1>
+        <p id="welcomeText" class="text-secondary mb-0"></p>
+      </div>
+      <a class="btn btn-outline-primary btn-sm" href="jobs.html">Explore Jobs</a>
+    </div>
+
+    <div id="dashboardAlert"></div>
+
+    <section id="createJobSection" class="card shadow-sm border-0 mb-4" style="display:none;">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Create Job</h2>
+      </div>
+      <div class="card-body">
+        <form id="createJobForm" class="row g-3">
+          <div class="col-md-6"><label class="form-label">Title</label><input class="form-control" name="title" type="text" required></div>
+          <div class="col-md-3"><label class="form-label">Job Type</label><select class="form-select" name="job_type" required><option value="full_time">Full Time</option><option value="part_time">Part Time</option><option value="contract">Contract</option><option value="internship">Internship</option><option value="remote">Remote</option></select></div>
+          <div class="col-md-3"><label class="form-label">Location</label><input class="form-control" name="location" type="text"></div>
+          <div class="col-md-3"><label class="form-label">Salary Min</label><input class="form-control" name="salary_min" type="number" min="0"></div>
+          <div class="col-md-3"><label class="form-label">Salary Max</label><input class="form-control" name="salary_max" type="number" min="0"></div>
+          <div class="col-md-2"><label class="form-label">Currency</label><input class="form-control" name="salary_currency" type="text" value="USD"></div>
+          <div class="col-md-2"><label class="form-label">Experience</label><input class="form-control" name="experience_required" type="number" min="0"></div>
+          <div class="col-md-4"><label class="form-label">Education</label><input class="form-control" name="education_required" type="text"></div>
+          <div class="col-md-4"><label class="form-label">Skills Required</label><input class="form-control" name="skills_required" type="text"></div>
+          <div class="col-md-4"><label class="form-label">Deadline</label><input class="form-control" name="application_deadline" type="date"></div>
+          <div class="col-md-2"><label class="form-label">Positions</label><input class="form-control" name="positions_available" type="number" min="1" value="1"></div>
+          <div class="col-md-6"><label class="form-label">Description</label><textarea class="form-control" name="description" rows="4" required></textarea></div>
+          <div class="col-md-3"><label class="form-label">Requirements</label><textarea class="form-control" name="requirements" rows="4"></textarea></div>
+          <div class="col-md-3"><label class="form-label">Responsibilities</label><textarea class="form-control" name="responsibilities" rows="4"></textarea></div>
+          <div class="col-12 d-grid d-md-flex"><button class="btn btn-primary" type="submit">Create Job</button></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="jobsSection" class="card shadow-sm border-0 mb-4">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Your Jobs</h2>
+      </div>
+      <div class="card-body" id="jobsPanel"></div>
+    </section>
+
+    <section class="card shadow-sm border-0">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Applications</h2>
+      </div>
+      <div class="card-body" id="applicationsPanel"></div>
+    </section>
+  </main>
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/common.js"></script>
+  <script src="../assets/js/dashboard.js"></script>
+</body>
+</html>
