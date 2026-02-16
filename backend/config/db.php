@@ -9,7 +9,6 @@ define('UPLOAD_DIR', __DIR__ . '/../uploads/');
 define('MAX_FILE_SIZE', 5 * 1024 * 1024);
 define('ALLOWED_FILE_TYPES', ['pdf', 'doc', 'docx']);
 define('SESSION_LIFETIME', 3600 * 24);
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
