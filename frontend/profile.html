@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobPortal | Profile</title>
+  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/auth.css">
+</head>
+<body>
+  <div id="topNav"></div>
+  <main class="container py-4">
+    <h1 class="h3 mb-3">Profile</h1>
+    <div id="profileAlert"></div>
+
+    <section class="card shadow-sm border-0 mb-4">
+      <div class="card-header bg-white"><h2 class="h5 mb-0">Profile Details</h2></div>
+      <div class="card-body">
+        <form id="profileForm" class="row g-3" enctype="multipart/form-data">
+          <div class="col-md-6"><label class="form-label" for="email">Email</label><input id="email" class="form-control" type="email" disabled></div>
+          <div class="col-md-6"><label class="form-label" for="role">Role</label><input id="role" class="form-control" type="text" disabled></div>
+          <div class="col-md-6"><label class="form-label" for="full_name">Full Name</label><input id="full_name" name="full_name" class="form-control" type="text"></div>
+          <div class="col-md-6"><label class="form-label" for="phone">Phone</label><input id="phone" name="phone" class="form-control" type="text"></div>
+
+          <div id="jobSeekerFields" class="col-12 rounded-3 p-3 border seeker-employer-box">
+            <div class="row g-3">
+              <div class="col-md-6"><label class="form-label" for="skills">Skills</label><input id="skills" name="skills" class="form-control" type="text"></div>
+              <div class="col-md-3"><label class="form-label" for="experience_years">Experience Years</label><input id="experience_years" name="experience_years" class="form-control" type="number" min="0"></div>
+              <div class="col-md-3"><label class="form-label" for="education">Education</label><input id="education" name="education" class="form-control" type="text"></div>
+              <div class="col-md-8"><label class="form-label" for="bio">Bio</label><textarea id="bio" name="bio" class="form-control" rows="4"></textarea></div>
+              <div class="col-md-4"><label class="form-label">Resume</label><input name="resume" class="form-control" type="file" accept=".pdf,.doc,.docx"></div>
+              <div class="col-md-4"><label class="form-label">Profile Picture</label><input name="profile_picture" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif"></div>
+            </div>
+          </div>
+
+          <div id="employerFields" class="col-12 rounded-3 p-3 border seeker-employer-box">
+            <div class="row g-3">
+              <div class="col-md-6"><label class="form-label" for="company_name">Company Name</label><input id="company_name" name="company_name" class="form-control" type="text"></div>
+              <div class="col-md-6"><label class="form-label" for="company_website">Company Website</label><input id="company_website" name="company_website" class="form-control" type="url"></div>
+              <div class="col-md-8"><label class="form-label" for="company_description">Company Description</label><textarea id="company_description" name="company_description" class="form-control" rows="4"></textarea></div>
+              <div class="col-md-4"><label class="form-label">Company Logo</label><input name="company_logo" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif"></div>
+            </div>
+          </div>
+
+          <div class="col-12 d-grid d-md-flex"><button class="btn btn-primary" type="submit">Update Profile</button></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="card shadow-sm border-0">
+      <div class="card-header bg-white"><h2 class="h5 mb-0">Change Password</h2></div>
+      <div class="card-body">
+        <div id="passwordAlert"></div>
+        <form id="passwordForm" class="row g-3">
+          <div class="col-md-6"><label class="form-label">Current Password</label><input name="current_password" class="form-control" type="password" required></div>
+          <div class="col-md-6"><label class="form-label">New Password</label><input name="new_password" class="form-control" type="password" minlength="4" required></div>
+          <div class="col-12 d-grid d-md-flex"><button class="btn btn-primary" type="submit">Change Password</button></div>
+        </form>
+      </div>
+    </section>
+  </main>
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/common.js"></script>
+  <script src="../assets/js/profile.js"></script>
+</body>
+</html>

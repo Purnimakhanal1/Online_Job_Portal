@@ -17,7 +17,6 @@ try {
         throw new Exception("User not found");
     }
 
-    unset($user['is_active']);
     $user['created_at'] = date('Y-m-d H:i:s', strtotime($user['created_at']));
     $user['updated_at'] = date('Y-m-d H:i:s', strtotime($user['updated_at']));
 
