@@ -45,14 +45,14 @@ if (-not [string]::IsNullOrWhiteSpace($dumpDir) -and -not (Test-Path $dumpDir)) 
 
 Write-Host "[1/2] Dumping Supabase database to $DumpFile ..."
 $env:PGPASSWORD = $SupabasePassword
-pg_dump --host=$SupabaseHost --port=$SupabasePort --username=$SupabaseUser --dbname=$SupabaseDb --format=custom --file=$DumpFile --no-owner --no-privileges
+pg_dump --host=$SupabaseHost --port=$SupabasePort --username=$SupabaseUser --dbname=$SupabaseDb --format=custom --file=$DumpFile --no-owner --no-privileges --schema=public
 if ($LASTEXITCODE -ne 0) {
     throw "pg_dump failed with exit code $LASTEXITCODE"
 }
 
 Write-Host "[2/2] Restoring snapshot into local database $LocalDb ..."
 $env:PGPASSWORD = $LocalPassword
-pg_restore --clean --if-exists --no-owner --no-privileges --host=$LocalHost --port=$LocalPort --username=$LocalUser --dbname=$LocalDb $DumpFile
+pg_restore --clean --if-exists --no-owner --no-privileges --schema=public --host=$LocalHost --port=$LocalPort --username=$LocalUser --dbname=$LocalDb $DumpFile
 if ($LASTEXITCODE -ne 0) {
     throw "pg_restore failed with exit code $LASTEXITCODE"
 }
