@@ -1,65 +1,6 @@
 <?php
 require_once __DIR__ . '/response.php';
 
-function loadProjectEnv() {
-    static $loaded = false;
-    if ($loaded) {
-        return;
-    }
-    $loaded = true;
-
-    $envPath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . '.env';
-    if (!is_file($envPath) || !is_readable($envPath)) {
-        return;
-    }
-
-    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    if ($lines === false) {
-        return;
-    }
-
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line === '' || $line[0] === '#') {
-            continue;
-        }
-
-        $separatorPos = strpos($line, '=');
-        if ($separatorPos === false) {
-            continue;
-        }
-
-        $key = trim(substr($line, 0, $separatorPos));
-        if ($key === '' || getenv($key) !== false) {
-            continue;
-        }
-
-        $value = trim(substr($line, $separatorPos + 1));
-        $valueLength = strlen($value);
-        if ($valueLength >= 2) {
-            $first = $value[0];
-            $last = $value[$valueLength - 1];
-            if (($first === '"' && $last === '"') || ($first === "'" && $last === "'")) {
-                $value = substr($value, 1, -1);
-            }
-        }
-
-        putenv($key . '=' . $value);
-        $_ENV[$key] = $value;
-        $_SERVER[$key] = $value;
-    }
-}
-
-loadProjectEnv();
-
-function envOrDefault($key, $default) {
-    $value = getenv($key);
-    if ($value === false || $value === '') {
-        return $default;
-    }
-    return $value;
-}
-
 function currentRequestIsHttps() {
     if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
         return true;
@@ -70,14 +11,15 @@ function currentRequestIsHttps() {
     return false;
 }
 
-define('DB_HOST', envOrDefault('DB_HOST', 'localhost'));
-define('DB_PORT', envOrDefault('DB_PORT', '5432'));
-define('DB_NAME', envOrDefault('DB_NAME', 'job_portal'));
-define('DB_USER', envOrDefault('DB_USER', 'postgres'));
-define('DB_PASSWORD', envOrDefault('DB_PASSWORD', ''));
-define('BASE_URL', envOrDefault('BASE_URL', 'http://localhost'));
-define('UPLOAD_DIR', envOrDefault('UPLOAD_DIR', __DIR__ . '/../uploads/'));
-define('APP_LOG_FILE', envOrDefault('APP_LOG_FILE', __DIR__ . '/../logs/app.log'));
+define('DB_HOST', 'localhost');
+define('DB_PORT', '5432');
+define('DB_NAME', 'job_portal');
+define('DB_USER', 'postgres');
+define('DB_PASSWORD', '');
+define('BASE_URL', 'http://localhost/OnlineWebPortal');
+define('UPLOAD_DIR', __DIR__ . '/../uploads/');
+define('APP_LOG_FILE', __DIR__ . '/../logs/app.log');
+define('APP_DEBUG', true);
 define('MAX_FILE_SIZE', 5 * 1024 * 1024);
 define('ALLOWED_FILE_TYPES', ['pdf', 'doc', 'docx']);
 define('SESSION_LIFETIME', 3600 * 24);
@@ -86,8 +28,7 @@ define('SESSION_COOKIE_SAMESITE', 'Lax');
 define('SESSION_COOKIE_SECURE', currentRequestIsHttps());
 define('CSRF_COOKIE_ENABLED', true);
 error_reporting(E_ALL);
-$debug = strtolower(envOrDefault('APP_DEBUG', ''));
-ini_set('display_errors', ($debug === '1' || $debug === 'true') ? 1 : 0);
+ini_set('display_errors', APP_DEBUG ? 1 : 0);
 
 class Database {
     private static $instance = null;
