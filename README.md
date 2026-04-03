@@ -2,6 +2,11 @@
 
 A simple job portal built with static frontend pages, a PHP backend, and PostgreSQL. This version is meant to run locally on Apache/XAMPP and stores uploaded files on the local filesystem.
 
+It supports three roles:
+- `job_seeker` can browse jobs and apply
+- `employer` can post jobs and manage applications
+- `admin` can view platform stats, review all users, and moderate jobs
+
 ## Stack
 
 - HTML, CSS, Bootstrap, vanilla JavaScript
@@ -18,6 +23,7 @@ OnlineWebPortal/
 ├── assets/                # CSS, JS, images, icons
 ├── backend/               # PHP API endpoints, config, logs, uploads
 │   ├── auth/
+│   ├── admin/
 │   ├── jobs/
 │   ├── applications/
 │   ├── users/
@@ -26,6 +32,7 @@ OnlineWebPortal/
 │   └── logs/
 ├── database/
 │   └── job_portal.sql
+├── LICENSE
 └── README.md
 ```
 
@@ -39,11 +46,17 @@ OnlineWebPortal/
 6. Start Apache from XAMPP.
 7. Open `http://localhost/OnlineWebPortal/frontend/index.html`.
 
+## Demo Accounts
+
+- `admin@example.com` / `Pass@1234`
+- `employer@example.com` / `Pass@1234`
+- `jobseeker@example.com` / `Pass@1234`
+
 ## Notes
 
 - Uploaded resumes, profile pictures, and logos are stored under `backend/uploads/`.
 - Database settings are currently configured directly in [db.php](/d:/OnlineWebPortal/backend/config/db.php).
-- The main database schema is in [job_portal.sql](/d:/OnlineWebPortal/database/job_portal.sql).
+- The main database schema and sample data are in [job_portal.sql](/d:/OnlineWebPortal/database/job_portal.sql).
 
 ## License
 
