@@ -1,20 +1,31 @@
 (function () {
-  var configuredBase = window.API_BASE_URL || localStorage.getItem('jp_api_base');
-  var inferredBase = '';
-  if (location.protocol.indexOf('http') === 0) {
+  var CSRF_TOKEN_KEY = 'jp_csrf_token';
+
+  function inferBaseUrl() {
     var path = location.pathname;
     if (path.indexOf('/frontend/') !== -1) {
-      inferredBase = location.origin + path.split('/frontend/')[0] + '/backend';
-    } else if (path.indexOf('/backend/') !== -1) {
-      inferredBase = location.origin + path.split('/backend/')[0] + '/backend';
-    } else {
-      inferredBase = location.origin + '/backend';
+      return location.origin + path.split('/frontend/')[0] + '/backend';
     }
-  } else {
-    inferredBase = 'http://localhost:8000';
+    if (path.indexOf('/backend/') !== -1) {
+      return location.origin + path.split('/backend/')[0] + '/backend';
+    }
+    return location.origin + '/backend';
   }
 
-  var baseUrl = (configuredBase || inferredBase).replace(/\/+$/, '');
+  var baseUrl = inferBaseUrl().replace(/\/+$/, '');
+
+  function getStoredCsrfToken() {
+    return localStorage.getItem(CSRF_TOKEN_KEY) || getCookie('jp_csrf');
+  }
+
+  function setStoredCsrfToken(token) {
+    if (!token) return;
+    localStorage.setItem(CSRF_TOKEN_KEY, token);
+  }
+
+  function clearStoredCsrfToken() {
+    localStorage.removeItem(CSRF_TOKEN_KEY);
+  }
 
   function withQuery(path, query) {
     if (!query) return path;
@@ -42,8 +53,19 @@
         error.data = data;
         throw error;
       }
+      if (data.csrf_token) {
+        setStoredCsrfToken(data.csrf_token);
+      } else if (data.data && data.data.csrf_token) {
+        setStoredCsrfToken(data.data.csrf_token);
+      }
       return data;
     });
+  }
+
+  function getCookie(name) {
+    var escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var match = document.cookie.match(new RegExp('(?:^|;\\s*)' + escaped + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : '';
   }
 
   function request(path, options) {
@@ -56,6 +78,11 @@
       credentials: 'include',
       headers: {}
     };
+    var method = (fetchOpts.method || 'GET').toUpperCase();
+    if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
+      var csrf = getStoredCsrfToken();
+      if (csrf) fetchOpts.headers['X-CSRF-Token'] = csrf;
+    }
 
     if (opts.body !== undefined && opts.body !== null) {
       if (opts.body instanceof FormData) {
@@ -70,12 +97,14 @@
   }
 
   var api = {
-    getBaseUrl: function () {
-      return baseUrl;
+    setCsrfToken: function (token) {
+      setStoredCsrfToken(token);
     },
-    setBaseUrl: function (next) {
-      baseUrl = (next || '').replace(/\/+$/, '');
-      localStorage.setItem('jp_api_base', baseUrl);
+    clearCsrfToken: function () {
+      clearStoredCsrfToken();
+    },
+    getCsrfToken: function () {
+      return getStoredCsrfToken();
     },
     login: function (payload) {
       return request('auth/login.php', { method: 'POST', body: payload });
@@ -88,6 +117,21 @@
     },
     getJobs: function (query) {
       return request('jobs/fetch_jobs.php', { query: query });
+    },
+    getAdminJobs: function (query) {
+      return request('admin/jobs.php', { query: query });
+    },
+    getAdminStats: function () {
+      return request('admin/stats.php');
+    },
+    getAdminUsers: function (query) {
+      return request('admin/users.php', { query: query });
+    },
+    updateAdminJobStatus: function (payload) {
+      return request('admin/toggle_job.php', { method: 'PUT', body: payload });
+    },
+    updateAdminUserStatus: function (payload) {
+      return request('admin/toggle_user.php', { method: 'PUT', body: payload });
     },
     getJobDetails: function (id) {
       return request('jobs/job_details.php', { query: { id: id } });

@@ -2,20 +2,24 @@
 require_once __DIR__ . '/../config/db.php';
 
 try {
-    if (!isset($_SESSION['user_id'])) {
-        http_response_code(403);
-        throw new Exception("You must be logged in to update profile");
-    }
+    requireAuth(['job_seeker', 'employer', 'admin']);
+    $uploadedFilesToCleanup = [];
+    $oldFilesToDelete = [];
 
     $is_multipart = strpos($_SERVER['CONTENT_TYPE'] ?? '', 'multipart/form-data') !== false;
     $data = $is_multipart ? $_POST : (array)json_decode(file_get_contents('php://input'), true);
 
     $db = getDB();
+    $db->beginTransaction();
+    $currentUploads = null;
     $update_fields = [];
     $params = [];
     $common_fields = ['full_name', 'phone'];
     foreach ($common_fields as $field) {
         if (isset($data[$field])) {
+            if ($field === 'phone' && !isValidPhoneNumber(trim((string)$data[$field]))) {
+                throw new Exception("Phone must be 10 digits and start with 9841 or 9746");
+            }
             $update_fields[] = "$field = ?";
             $params[] = $data[$field];
         }
@@ -37,20 +41,22 @@ try {
             if (!in_array($file_ext, ALLOWED_FILE_TYPES)) {
                 throw new Exception("Invalid file type. Allowed: PDF, DOC, DOCX");
             }
-            $filename = 'resume_' . $_SESSION['user_id'] . '_' . time() . '.' . $file_ext;
-            $upload_path = UPLOAD_DIR . 'resumes/' . $filename;
-            if (!is_dir(dirname($upload_path))) {
-                mkdir(dirname($upload_path), 0755, true);
+            if (!validateUploadedMime($file['tmp_name'], ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])) {
+                throw new Exception("Invalid resume MIME type");
             }
-            if (move_uploaded_file($file['tmp_name'], $upload_path)) {
-                $update_fields[] = "resume_path = ?";
-                $params[] = 'uploads/resumes/' . $filename;
-                $stmt = $db->prepare("SELECT resume_path FROM users WHERE id = ?");
+            $filename = 'resume_' . $_SESSION['user_id'] . '_' . time() . '.' . $file_ext;
+            if ($currentUploads === null) {
+                $stmt = $db->prepare("SELECT resume_path, profile_picture, company_logo FROM users WHERE id = ?");
                 $stmt->execute([$_SESSION['user_id']]);
-                $old = $stmt->fetch();
-                if ($old && !empty($old['resume_path']) && file_exists(__DIR__ . '/../' . $old['resume_path'])) {
-                    unlink(__DIR__ . '/../' . $old['resume_path']);
-                }
+                $currentUploads = $stmt->fetch() ?: [];
+            }
+            $storedPath = storageUploadFile($file['tmp_name'], 'resumes', $filename);
+            $uploadedFilesToCleanup[] = $storedPath;
+            $update_fields[] = "resume_path = ?";
+            $params[] = $storedPath;
+            if (!empty($currentUploads['resume_path'])) {
+                $oldFilesToDelete[] = $currentUploads['resume_path'];
+                $currentUploads['resume_path'] = null;
             }
         }
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -60,17 +66,25 @@ try {
             if (!in_array($file_ext, $allowed_img)) {
                 throw new Exception("Invalid image type");
             }
+            if (!validateUploadedMime($file['tmp_name'], ['image/jpeg', 'image/png', 'image/gif'])) {
+                throw new Exception("Invalid profile image MIME type");
+            }
             if ($file['size'] > 2 * 1024 * 1024) {
                 throw new Exception("Image size must be less than 2MB");
             }
             $filename = 'profile_' . $_SESSION['user_id'] . '_' . time() . '.' . $file_ext;
-            $upload_path = UPLOAD_DIR . 'profiles/' . $filename;
-            if (!is_dir(dirname($upload_path))) {
-                mkdir(dirname($upload_path), 0755, true);
+            if ($currentUploads === null) {
+                $stmt = $db->prepare("SELECT resume_path, profile_picture, company_logo FROM users WHERE id = ?");
+                $stmt->execute([$_SESSION['user_id']]);
+                $currentUploads = $stmt->fetch() ?: [];
             }
-            if (move_uploaded_file($file['tmp_name'], $upload_path)) {
-                $update_fields[] = "profile_picture = ?";
-                $params[] = 'uploads/profiles/' . $filename;
+            $storedPath = storageUploadFile($file['tmp_name'], 'profiles', $filename);
+            $uploadedFilesToCleanup[] = $storedPath;
+            $update_fields[] = "profile_picture = ?";
+            $params[] = $storedPath;
+            if (!empty($currentUploads['profile_picture'])) {
+                $oldFilesToDelete[] = $currentUploads['profile_picture'];
+                $currentUploads['profile_picture'] = null;
             }
         }
     } else if ($_SESSION['role'] === 'employer') {
@@ -87,17 +101,25 @@ try {
             if (!in_array($file_ext, $allowed_img)) {
                 throw new Exception("Invalid image type");
             }
+            if (!validateUploadedMime($file['tmp_name'], ['image/jpeg', 'image/png', 'image/gif'])) {
+                throw new Exception("Invalid company logo MIME type");
+            }
             if ($file['size'] > 2 * 1024 * 1024) {
                 throw new Exception("Image size must be less than 2MB");
             }
             $filename = 'company_' . $_SESSION['user_id'] . '_' . time() . '.' . $file_ext;
-            $upload_path = UPLOAD_DIR . 'logos/' . $filename;
-            if (!is_dir(dirname($upload_path))) {
-                mkdir(dirname($upload_path), 0755, true);
+            if ($currentUploads === null) {
+                $stmt = $db->prepare("SELECT resume_path, profile_picture, company_logo FROM users WHERE id = ?");
+                $stmt->execute([$_SESSION['user_id']]);
+                $currentUploads = $stmt->fetch() ?: [];
             }
-            if (move_uploaded_file($file['tmp_name'], $upload_path)) {
-                $update_fields[] = "company_logo = ?";
-                $params[] = 'uploads/logos/' . $filename;
+            $storedPath = storageUploadFile($file['tmp_name'], 'logos', $filename);
+            $uploadedFilesToCleanup[] = $storedPath;
+            $update_fields[] = "company_logo = ?";
+            $params[] = $storedPath;
+            if (!empty($currentUploads['company_logo'])) {
+                $oldFilesToDelete[] = $currentUploads['company_logo'];
+                $currentUploads['company_logo'] = null;
             }
         }
     }
@@ -111,6 +133,12 @@ try {
     $stmt = $db->prepare($sql);
     $stmt->execute($params);
     $result = $stmt->fetch();
+    auditLog('profile.updated', 'user', $_SESSION['user_id'], ['fields' => $update_fields]);
+    $db->commit();
+    foreach ($oldFilesToDelete as $oldFile) {
+        storageDeleteFile($oldFile);
+    }
+    $uploadedFilesToCleanup = [];
 
     echo json_encode([
         'success' => true,
@@ -119,6 +147,12 @@ try {
     ]);
 
 } catch (Exception $e) {
+    if (isset($db) && $db instanceof PDO && $db->inTransaction()) {
+        $db->rollBack();
+    }
+    foreach ($uploadedFilesToCleanup as $uploadedFile) {
+        storageDeleteFile($uploadedFile);
+    }
     $code = http_response_code();
     if ($code === 200) {
         http_response_code(400);

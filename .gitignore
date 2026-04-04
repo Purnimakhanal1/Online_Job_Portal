@@ -4,14 +4,22 @@
 .env.*.local
 
 # Upload directories
-uploads/*
-!uploads/.gitkeep
 backend/uploads/*
 !backend/uploads/.gitkeep
+!backend/uploads/resumes/
+backend/uploads/resumes/*
+!backend/uploads/resumes/.gitkeep
+!backend/uploads/profiles/
+backend/uploads/profiles/*
+!backend/uploads/profiles/.gitkeep
+!backend/uploads/logos/
+backend/uploads/logos/*
+!backend/uploads/logos/.gitkeep
 
 # Logs
+backend/logs/*
+!backend/logs/.gitkeep
 *.log
-logs/
 *.log.*
 
 # OS generated files
@@ -38,11 +46,6 @@ Thumbs.db
 # Composer
 /vendor/
 composer.lock
-
-# NPM (if using any frontend build tools)
-node_modules/
-npm-debug.log
-yarn-error.log
 
 # Temporary files
 tmp/
@@ -71,6 +74,11 @@ sessions/
 config/secrets.php
 private_keys/
 certificates/
+*.pem
+*.key
+*.p12
+*.pfx
+backend/config/*secret*.php
 
 # Documentation build
 docs/_build/
@@ -80,5 +88,5 @@ coverage/
 .coverage
 htmlcov/
 
-# Local sync script with real credentials
-scripts/sync_supabase_to_local.local.ps1
+# Legacy local db config filename
+/db.php

@@ -17,6 +17,27 @@
 
   function clearUser() {
     localStorage.removeItem(USER_KEY);
+    if (window.JobPortalAPI && typeof window.JobPortalAPI.clearCsrfToken === 'function') {
+      window.JobPortalAPI.clearCsrfToken();
+    }
+  }
+
+  function setCookie(name, value, days) {
+    var maxAge = '';
+    if (typeof days === 'number' && days > 0) {
+      maxAge = '; max-age=' + String(days * 24 * 60 * 60);
+    }
+    document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value || '') + '; path=/' + maxAge + '; samesite=lax';
+  }
+
+  function getCookie(name) {
+    var escaped = encodeURIComponent(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var match = document.cookie.match(new RegExp('(?:^|;\\s*)' + escaped + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+
+  function deleteCookie(name) {
+    document.cookie = encodeURIComponent(name) + '=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax';
   }
 
   function isLoggedIn() {
@@ -58,6 +79,30 @@
     el.innerHTML = '';
   }
 
+  function setButtonLoading(button, isLoading, loadingText) {
+    if (!button) return;
+    if (isLoading) {
+      if (!button.getAttribute('data-original-text')) {
+        button.setAttribute('data-original-text', button.textContent || '');
+      }
+      button.disabled = true;
+      button.textContent = loadingText || 'Please wait...';
+      return;
+    }
+    button.disabled = false;
+    var original = button.getAttribute('data-original-text');
+    if (original !== null) {
+      button.textContent = original;
+      button.removeAttribute('data-original-text');
+    }
+  }
+
+  function setFormLoading(form, isLoading, loadingText) {
+    if (!form) return;
+    var submitBtn = form.querySelector('button[type="submit"]');
+    setButtonLoading(submitBtn, isLoading, loadingText);
+  }
+
   function formatMoney(min, max, currency) {
     if (!min && !max) return 'Not specified';
     var fmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
@@ -86,22 +131,22 @@
   function navTemplate() {
     var user = getUser();
     var links = [
-      '<a class="nav-link" href="index.html">Home</a>',
-      '<a class="nav-link" href="jobs.html">Jobs</a>'
+      '<a class="nav-link" href="index.html"><i class="bi bi-house-door me-1"></i>Home</a>',
+      '<a class="nav-link" href="jobs.html"><i class="bi bi-briefcase me-1"></i>Jobs</a>'
     ];
 
     if (user) {
-      links.push('<a class="nav-link" href="dashboard.html">Dashboard</a>');
-      links.push('<a class="nav-link" href="profile.html">Profile</a>');
-      links.push('<button id="logoutBtn" class="btn btn-outline-danger btn-sm ms-2">Logout</button>');
+      links.push('<a class="nav-link" href="dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>');
+      links.push('<a class="nav-link" href="profile.html"><i class="bi bi-person-circle me-1"></i>Profile</a>');
+      links.push('<button id="logoutBtn" class="btn btn-outline-danger btn-sm ms-2"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>');
     } else {
-      links.push('<a class="nav-link" href="login.html">Login</a>');
-      links.push('<a class="btn btn-primary btn-sm ms-2" href="register.html">Register</a>');
+      links.push('<a class="nav-link" href="login.html"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a>');
+      links.push('<a class="btn btn-primary btn-sm ms-2" href="register.html"><i class="bi bi-person-plus-fill me-1"></i>Register</a>');
     }
 
     return '<nav class="navbar bg-white border-bottom sticky-top">'
       + '<div class="container d-flex flex-wrap gap-2 py-2">'
-      + '<a class="navbar-brand fw-bold me-auto" href="index.html">JobPortal</a>'
+      + '<a class="navbar-brand fw-bold me-auto" href="index.html"><i class="bi bi-briefcase-fill me-2"></i>JobPortal</a>'
       + '<div class="navbar-nav flex-row flex-wrap align-items-center gap-1">' + links.join('') + '</div>'
       + '</div>'
       + '</nav>';
@@ -141,11 +186,16 @@
     getUser: getUser,
     setUser: setUser,
     clearUser: clearUser,
+    setCookie: setCookie,
+    getCookie: getCookie,
+    deleteCookie: deleteCookie,
     isLoggedIn: isLoggedIn,
     ensureAuth: ensureAuth,
     parseQuery: parseQuery,
     showAlert: showAlert,
     clearAlert: clearAlert,
+    setButtonLoading: setButtonLoading,
+    setFormLoading: setFormLoading,
     formatMoney: formatMoney,
     formatDate: formatDate,
     escapeHtml: escapeHtml,
