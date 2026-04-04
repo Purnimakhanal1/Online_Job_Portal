@@ -65,6 +65,64 @@
       <div class="stat-card reveal"><div class="stat-num skeleton" style="height:36px;width:60px">​</div><div class="stat-lbl">—</div></div>
     </div>
 
+    <!-- Admin: Stats & Management Section -->
+    <section id="adminSection" class="hidden mb-4">
+      <div class="card mb-4">
+        <div class="card-header"><h2>Platform Overview</h2></div>
+        <div class="card-body">
+          <div class="stats-row" id="adminStatsRow" style="margin-bottom:0">
+            <div class="stat-card"><div class="stat-num" id="adminStatUsers">—</div><div class="stat-lbl">Total Users</div></div>
+            <div class="stat-card"><div class="stat-num" id="adminStatJobs">—</div><div class="stat-lbl">Total Jobs</div></div>
+            <div class="stat-card"><div class="stat-num" id="adminStatApps">—</div><div class="stat-lbl">Applications</div></div>
+            <div class="stat-card"><div class="stat-num" id="adminStatActive">—</div><div class="stat-lbl">Active Jobs</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Tabs -->
+      <div class="card">
+        <div class="card-body">
+          <div class="tabs" id="adminTabs">
+            <button class="tab-btn active" data-tab="adminUsersTab">Users</button>
+            <button class="tab-btn" data-tab="adminJobsTab">Jobs</button>
+          </div>
+          <div class="tab-panel active" id="adminUsersTab">
+            <div id="adminUsersPanel"><div class="empty-state"><p>Loading users…</p></div></div>
+          </div>
+          <div class="tab-panel" id="adminJobsTab">
+            <div id="adminJobsPanel"><div class="empty-state"><p>Loading jobs…</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Job Seeker: Quick Actions -->
+    <section id="seekerQuickActions" class="hidden mb-4">
+      <div class="card">
+        <div class="card-header"><h2>Quick Actions</h2></div>
+        <div class="card-body">
+          <div class="flex gap-3 flex-wrap">
+            <a href="jobs.html" class="btn btn-primary">🔍 Browse Jobs</a>
+            <a href="profile.html" class="btn btn-ghost">📄 Update Resume</a>
+            <a href="profile.html#section-pro" class="btn btn-ghost">✏️ Edit Skills</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Employer: Quick Stats Summary -->
+    <section id="employerQuickActions" class="hidden mb-4">
+      <div class="card">
+        <div class="card-header"><h2>Quick Actions</h2></div>
+        <div class="card-body">
+          <div class="flex gap-3 flex-wrap">
+            <button class="btn btn-primary" onclick="document.getElementById('createJobSection').scrollIntoView({behavior:'smooth'})">📝 Post New Job</button>
+            <a href="profile.html#section-company" class="btn btn-ghost">🏢 Edit Company Info</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Employer: Create Job -->
     <section id="createJobSection" class="card mb-4 hidden">
       <div class="card-header">
@@ -150,8 +208,8 @@
       </div>
     </section>
 
-    <!-- Tabs: Jobs / Applications -->
-    <div class="card">
+    <!-- Tabs: Jobs / Applications (for non-admin) -->
+    <div class="card" id="defaultTabsCard">
       <div class="card-body">
         <div class="tabs" id="dashTabs">
           <button class="tab-btn active" data-tab="applicationsTab">Applications</button>
@@ -178,6 +236,7 @@
   </main>
 
   <script src="portal-common.js"></script>
+  <script src="../assets/js/common.js"></script>
   <script src="../assets/js/api.js"></script>
   <script>
     // Tabs
