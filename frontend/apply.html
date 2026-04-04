@@ -3,44 +3,177 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JobPortal | Apply</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/auth.css">
+  <title>JobPortal — Apply</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="portal.css">
+  <style>
+    .apply-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+    @media (max-width: 768px) { .apply-layout { grid-template-columns: 1fr; } }
+    .sticky-sidebar { position: sticky; top: 80px; }
+
+    .job-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent-2); color: var(--accent);
+      padding: 6px 14px; border-radius: 100px; font-size: 13px; font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .tip-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .tip-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--ink-2); }
+    .tip-list li::before { content: '✓'; color: var(--success); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    .file-drop {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+      transition: border-color var(--transition), background var(--transition);
+      cursor: pointer;
+    }
+    .file-drop:hover, .file-drop.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-2);
+    }
+    .file-drop input { display: none; }
+    .file-drop .file-icon { font-size: 28px; margin-bottom: 8px; }
+    .file-drop .file-label { font-size: 14px; color: var(--ink-2); }
+    .file-drop .file-label span { color: var(--accent); font-weight: 500; }
+    .file-name { font-size: 13px; color: var(--success); margin-top: 8px; font-weight: 500; }
+
+    .char-count { font-size: 12px; color: var(--ink-3); text-align: right; margin-top: 4px; }
+    .char-count.warn { color: var(--warn); }
+  </style>
 </head>
 <body data-page="apply">
   <div id="topNav"></div>
+
   <main class="container py-4">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <section class="card shadow-sm border-0">
-          <div class="card-body p-4">
-            <h1 class="h3 mb-2">Apply to Job</h1>
-            <p id="jobSummary" class="text-secondary mb-3"></p>
-            <div id="applyAlert"></div>
-            <form id="applyForm" class="row g-3" enctype="multipart/form-data">
-              <input type="hidden" id="job_id" name="job_id">
-              <div class="col-12">
-                <label class="form-label">Cover Letter</label>
-                <textarea class="form-control" name="cover_letter" rows="7" required></textarea>
-              </div>
-              <div class="col-12">
-                <label class="form-label">Resume (PDF, DOC, DOCX)</label>
-                <input class="form-control" name="resume" type="file" accept=".pdf,.doc,.docx">
-              </div>
-              <div class="col-12 d-grid">
-                <button class="btn btn-primary" type="submit">Submit Application</button>
-              </div>
-            </form>
+    <a class="back-link" onclick="history.back()" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2);cursor:pointer;margin-bottom:20px;">← Back</a>
+
+    <div class="apply-layout">
+      <!-- Main form -->
+      <div>
+        <div id="jobSummaryBadge"></div>
+        <h1 style="font-size:1.8rem; margin-bottom:6px;">Submit Application</h1>
+        <p class="text-muted mb-4">Write a compelling cover letter and attach your resume.</p>
+
+        <div id="applyAlert"></div>
+
+        <form id="applyForm" enctype="multipart/form-data">
+          <input type="hidden" id="job_id" name="job_id">
+
+          <div class="form-group mb-4">
+            <label class="lbl" for="cover_letter">Cover Letter</label>
+            <textarea
+              id="cover_letter"
+              class="input"
+              name="cover_letter"
+              rows="12"
+              placeholder="Tell them why you're the right fit. Mention specific skills and experiences that match this role…"
+              required
+              maxlength="3000"
+            ></textarea>
+            <div class="char-count" id="charCount">0 / 3000</div>
           </div>
-        </section>
+
+          <div class="form-group mb-4">
+            <label class="lbl">Resume</label>
+            <div class="file-drop" id="fileDrop" onclick="document.getElementById('resumeFile').click()">
+              <div class="file-icon">📄</div>
+              <div class="file-label">
+                <span>Choose file</span> or drag & drop here
+              </div>
+              <div class="file-label" style="font-size:12px;margin-top:4px;">PDF, DOC, DOCX — max 5 MB</div>
+              <input type="file" id="resumeFile" name="resume" accept=".pdf,.doc,.docx">
+              <div class="file-name" id="fileName"></div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-lg btn-block" type="submit" id="submitBtn">
+            Submit Application →
+          </button>
+        </form>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sticky-sidebar">
+        <div class="card mb-3">
+          <div class="card-header"><h3>Job Summary</h3></div>
+          <div class="card-body" id="jobSummaryPanel">
+            <div class="skeleton mb-2" style="height:16px;width:80%"></div>
+            <div class="skeleton mb-2" style="height:13px;width:55%"></div>
+            <div class="skeleton" style="height:22px;width:70px;border-radius:100px"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>Tips</h3></div>
+          <div class="card-body">
+            <ul class="tip-list">
+              <li>Tailor your cover letter to this specific role</li>
+              <li>Mention relevant skills and achievements</li>
+              <li>Keep it concise — 3–4 short paragraphs</li>
+              <li>Proofread before submitting</li>
+              <li>Attach an up-to-date resume</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </main>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="portal-common.js"></script>
   <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/common.js"></script>
+  <script>
+    // Char counter
+    const ta = document.getElementById('cover_letter');
+    const cc = document.getElementById('charCount');
+    ta.addEventListener('input', () => {
+      const len = ta.value.length;
+      cc.textContent = `${len} / 3000`;
+      cc.classList.toggle('warn', len > 2700);
+    });
+
+    // File drop
+    const drop = document.getElementById('fileDrop');
+    const fileInput = document.getElementById('resumeFile');
+    const fileName = document.getElementById('fileName');
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) fileName.textContent = '✓ ' + fileInput.files[0].name;
+    });
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag-over'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+    drop.addEventListener('drop', e => {
+      e.preventDefault(); drop.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && /\.(pdf|doc|docx)$/i.test(file.name)) {
+        const dt = new DataTransfer(); dt.items.add(file); fileInput.files = dt.files;
+        fileName.textContent = '✓ ' + file.name;
+      }
+    });
+
+    // Load job info
+    async function loadJob() {
+      const id = new URLSearchParams(location.search).get('id');
+      if (!id) return;
+      document.getElementById('job_id').value = id;
+      try {
+        // const job = await api.getJob(id);
+        const job = null; // placeholder
+        if (!job) return;
+        document.getElementById('jobSummaryPanel').innerHTML = `
+          <div style="font-family:'Fraunces',serif;font-size:1rem;margin-bottom:4px;">${job.title}</div>
+          <div class="text-sm text-muted mb-2">${job.employer_name || ''}</div>
+          <div class="flex gap-2 flex-wrap">
+            ${job.job_type ? `<span class="badge">${formatJobType(job.job_type)}</span>` : ''}
+            ${job.location ? `<span class="badge badge-gray">${job.location}</span>` : ''}
+          </div>`;
+        document.getElementById('jobSummaryBadge').innerHTML = `<div class="job-pill">Applying to: ${job.title}</div>`;
+      } catch {}
+    }
+    loadJob();
+  </script>
   <script src="../assets/js/jobs.js"></script>
 </body>
 </html>
