@@ -121,6 +121,7 @@
   </div>
 
   <script src="portal-common.js"></script>
+  <script src="../assets/js/common.js"></script>
   <script src="../assets/js/api.js"></script>
   <script>
     // Role toggle
@@ -129,9 +130,10 @@
         document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const role = btn.dataset.role;
-        document.getElementById('role').value = role;
-        document.getElementById('jobSeekerFields').classList.toggle('hidden', role !== 'job_seeker');
-        document.getElementById('employerFields').classList.toggle('hidden', role !== 'employer');
+        const roleInput = document.getElementById('role');
+        roleInput.value = role;
+        // Dispatch change event for auth.js
+        roleInput.dispatchEvent(new Event('change'));
       });
     });
   </script>
