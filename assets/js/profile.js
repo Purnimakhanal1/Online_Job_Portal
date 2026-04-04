@@ -14,25 +14,74 @@
     document.getElementById('full_name').value = user.full_name || '';
     document.getElementById('phone').value = user.phone || '';
 
-    var seeker = document.getElementById('jobSeekerFields');
-    var employer = document.getElementById('employerFields');
+    // Update avatar
+    var avatarEl = document.getElementById('avatarEl');
+    var avatarName = document.getElementById('avatarName');
+    var avatarRole = document.getElementById('avatarRole');
+    if (avatarEl && user.profile_picture) {
+      avatarEl.innerHTML = '<img src="' + user.profile_picture + '" alt="Profile">';
+    } else if (avatarEl) {
+      avatarEl.textContent = (user.full_name || user.email || '?')[0].toUpperCase();
+    }
+    if (avatarName) avatarName.textContent = user.full_name || user.email || '—';
+    if (avatarRole) avatarRole.textContent = user.role === 'employer' ? 'Employer' : (user.role === 'admin' ? 'Admin' : 'Job Seeker');
+
+    // Role-specific fields - new structure uses data-role and section IDs
+    var seekerSection = document.getElementById('section-pro');
+    var employerSection = document.getElementById('section-company');
+    var seekerNav = document.getElementById('seekerNav');
+    var employerNav = document.getElementById('employerNav');
 
     if (user.role === 'job_seeker') {
-      seeker.style.display = 'block';
-      employer.style.display = 'none';
-      document.getElementById('skills').value = user.skills || '';
-      document.getElementById('experience_years').value = user.experience_years || '';
-      document.getElementById('education').value = user.education || '';
-      document.getElementById('bio').value = user.bio || '';
+      if (seekerSection) seekerSection.classList.remove('hidden');
+      if (employerSection) employerSection.classList.add('hidden');
+      if (seekerNav) seekerNav.style.display = '';
+      if (employerNav) employerNav.style.display = 'none';
+      
+      var skillsEl = document.getElementById('skills');
+      var expEl = document.getElementById('experience_years');
+      var eduEl = document.getElementById('education');
+      var bioEl = document.getElementById('bio');
+      if (skillsEl) skillsEl.value = user.skills || '';
+      if (expEl) expEl.value = user.experience_years || '';
+      if (eduEl) eduEl.value = user.education || '';
+      if (bioEl) bioEl.value = user.bio || '';
+
+      // Show current resume if exists
+      var currentResumeSection = document.getElementById('currentResumeSection');
+      if (user.resume_path && currentResumeSection) {
+        currentResumeSection.classList.remove('hidden');
+        var fileName = user.resume_path.split('/').pop();
+        document.getElementById('currentResumeName').textContent = fileName || 'Resume';
+        document.getElementById('viewResumeBtn').href = user.resume_path;
+        if (user.updated_at) {
+          document.getElementById('currentResumeDate').textContent = 'Uploaded: ' + JobPortalCommon.formatDate(user.updated_at);
+        }
+      }
+
+      // Show current profile picture
+      var currentPicSection = document.getElementById('currentProfilePicSection');
+      if (user.profile_picture && currentPicSection) {
+        currentPicSection.classList.remove('hidden');
+        document.getElementById('currentProfilePicPreview').src = user.profile_picture;
+      }
     } else if (user.role === 'employer') {
-      seeker.style.display = 'none';
-      employer.style.display = 'block';
-      document.getElementById('company_name').value = user.company_name || '';
-      document.getElementById('company_website').value = user.company_website || '';
-      document.getElementById('company_description').value = user.company_description || '';
+      if (seekerSection) seekerSection.classList.add('hidden');
+      if (employerSection) employerSection.classList.remove('hidden');
+      if (seekerNav) seekerNav.style.display = 'none';
+      if (employerNav) employerNav.style.display = '';
+      
+      var compNameEl = document.getElementById('company_name');
+      var compWebEl = document.getElementById('company_website');
+      var compDescEl = document.getElementById('company_description');
+      if (compNameEl) compNameEl.value = user.company_name || '';
+      if (compWebEl) compWebEl.value = user.company_website || '';
+      if (compDescEl) compDescEl.value = user.company_description || '';
     } else {
-      seeker.style.display = 'none';
-      employer.style.display = 'none';
+      if (seekerSection) seekerSection.classList.add('hidden');
+      if (employerSection) employerSection.classList.add('hidden');
+      if (seekerNav) seekerNav.style.display = 'none';
+      if (employerNav) employerNav.style.display = 'none';
     }
   }
 
@@ -112,6 +161,35 @@
     JobPortalCommon.renderNav();
     var user = JobPortalCommon.ensureAuth(['job_seeker', 'employer', 'admin']);
     if (!user) return;
+    
+    // Resume removal handler
+    var removeResumeBtn = document.getElementById('removeResumeBtn');
+    if (removeResumeBtn) {
+      removeResumeBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to remove your resume? You can upload a new one anytime.')) {
+          // This would need a backend endpoint to handle resume removal
+          document.getElementById('currentResumeSection').classList.add('hidden');
+          JobPortalCommon.showAlert('#profileAlert', 'Resume removed. Upload a new one to update your profile.', 'info');
+        }
+      });
+    }
+
+    // Profile picture removal handler  
+    var removePicBtn = document.getElementById('removeProfilePicBtn');
+    if (removePicBtn) {
+      removePicBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to remove your profile picture?')) {
+          document.getElementById('currentProfilePicSection').classList.add('hidden');
+          var avatarEl = document.getElementById('avatarEl');
+          if (avatarEl && user) {
+            avatarEl.textContent = (user.full_name || user.email || '?')[0].toUpperCase();
+            avatarEl.querySelector('img')?.remove();
+          }
+          JobPortalCommon.showAlert('#profileAlert', 'Profile picture removed. Upload a new one to update.', 'info');
+        }
+      });
+    }
+
     initProfileUpdate();
     initPasswordChange();
     loadProfile();
