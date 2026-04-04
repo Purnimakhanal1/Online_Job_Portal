@@ -3,49 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JobPortal | Home</title>
-  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/jobs.css">
+  <title>JobPortal — Find Your Next Opportunity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="portal.css">
+  <style>
+    .employer-card {
+      background: var(--ink);
+      color: #fff;
+      border: 1px solid var(--ink);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+    .employer-card h3 { font-family: 'Fraunces', serif; font-weight: 300; color: #fff; margin-bottom: 8px; }
+    .employer-card p { color: rgba(255,255,255,.65); font-size: 14px; margin-bottom: 20px; }
+    .employer-card .btn-accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px; }
+    @media (max-width: 600px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+
+    .hero-grid { display: grid; grid-template-columns: 1fr 320px; gap: 32px; align-items: center; }
+    @media (max-width: 768px) { .hero-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body data-page="home">
   <div id="topNav"></div>
-  <main class="container py-4">
-    <section class="hero card border-0 shadow-sm mb-4">
-      <div class="card-body p-4 p-md-5">
-        <div class="row g-4 align-items-center">
-          <div class="col-md-8">
-            <h1 class="display-6 fw-bold mb-2">Find your next opportunity</h1>
-            <p class="text-secondary mb-3">Browse jobs, apply faster, and track every application in one place.</p>
-            <div class="d-flex flex-wrap gap-2">
-              <a class="btn btn-primary" href="jobs.html">Browse Jobs</a>
-              <a class="btn btn-outline-primary" href="register.html">Create Account</a>
-            </div>
+
+  <main class="container py-6">
+
+    <!-- Hero -->
+    <section class="hero-section mb-6">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-eyebrow">Find · Apply · Grow</div>
+          <h1 class="hero-title">Find your next<br><em>opportunity</em></h1>
+          <p class="hero-sub">Browse curated jobs, apply in minutes, and track every application — all in one place.</p>
+          <div class="flex gap-2 flex-wrap">
+            <a href="jobs.html" class="btn btn-primary btn-lg">Browse Jobs</a>
+            <a href="register.html" class="btn btn-ghost btn-lg">Create Account</a>
           </div>
-          <div class="col-md-4">
-            <div class="card bg-light border-0">
-              <div class="card-body">
-                <h5 class="card-title">For Employers</h5>
-                <p class="card-text text-secondary">Post roles, review candidates, and update statuses from your dashboard.</p>
-                <a class="btn btn-sm btn-dark" href="register.html">Hire Now</a>
-              </div>
-            </div>
-          </div>
+        </div>
+        <div class="employer-card reveal">
+          <h3>For Employers</h3>
+          <p>Post roles, review applications, and find the right talent faster.</p>
+          <a href="register.html?role=employer" class="btn btn-accent">Start Hiring →</a>
         </div>
       </div>
     </section>
 
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card reveal"><div class="stat-num" id="statJobs">—</div><div class="stat-lbl">Open positions</div></div>
+      <div class="stat-card reveal" style="animation-delay:.07s"><div class="stat-num">100%</div><div class="stat-lbl">Free to apply</div></div>
+      <div class="stat-card reveal" style="animation-delay:.14s"><div class="stat-num">Fast</div><div class="stat-lbl">Application tracking</div></div>
+    </div>
+
+    <!-- Featured jobs -->
     <section>
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4 mb-0">Featured Jobs</h2>
-        <a class="btn btn-sm btn-outline-secondary" href="jobs.html">View All</a>
+      <div class="flex items-center justify-between mb-3">
+        <h2 style="font-size:1.3rem">Featured Jobs</h2>
+        <a href="jobs.html" class="btn btn-ghost btn-sm">View all →</a>
       </div>
       <div id="featuredJobs" class="jobs-grid"></div>
     </section>
+
   </main>
-  <script src="../assets/js/jquery.min.js"></script>
+
+  <script src="portal-common.js"></script>
   <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/common.js"></script>
-  <script src="../assets/js/jobs.js"></script>
+  <script>
+    async function loadFeatured() {
+      const grid = document.getElementById('featuredJobs');
+      grid.innerHTML = skeletonCards(6);
+      try {
+        // Replace with actual API call: const data = await api.getJobs({limit:6});
+        const data = { jobs: [] }; // placeholder
+        if (!data.jobs || data.jobs.length === 0) {
+          grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+            <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <p>No jobs yet — check back soon.</p>
+          </div>`;
+          document.getElementById('statJobs').textContent = '0';
+        } else {
+          grid.innerHTML = data.jobs.slice(0,6).map(jobCard).join('');
+          document.getElementById('statJobs').textContent = data.total || data.jobs.length;
+          initReveal();
+        }
+      } catch(e) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>Unable to load jobs right now.</p></div>`;
+      }
+    }
+    loadFeatured();
+  </script>
 </body>
 </html>

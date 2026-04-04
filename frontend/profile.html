@@ -3,66 +3,248 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JobPortal | Profile</title>
-  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/auth.css">
+  <title>JobPortal — Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="portal.css">
+  <style>
+    .profile-layout { display: grid; grid-template-columns: 260px 1fr; gap: 24px; align-items: start; }
+    @media (max-width: 768px) { .profile-layout { grid-template-columns: 1fr; } }
+
+    .profile-sidebar { position: sticky; top: 80px; }
+
+    .avatar-section {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      padding: 28px 20px;
+    }
+    .avatar {
+      width: 88px; height: 88px; border-radius: 50%;
+      background: var(--accent-2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Fraunces', serif; font-size: 2rem; color: var(--accent);
+      margin-bottom: 14px; position: relative; overflow: hidden;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-name { font-family: 'Fraunces', serif; font-size: 1.1rem; margin-bottom: 4px; }
+    .avatar-role { font-size: 13px; color: var(--ink-2); }
+
+    .sidebar-nav { border-top: 1px solid var(--border); padding: 8px; }
+    .sidebar-nav a {
+      display: block; padding: 8px 14px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; color: var(--ink-2);
+      text-decoration: none; transition: background var(--transition), color var(--transition);
+    }
+    .sidebar-nav a:hover { background: var(--bg); color: var(--ink); opacity: 1; }
+    .sidebar-nav a.active { background: var(--accent-2); color: var(--accent); }
+
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .form-grid-2 { grid-template-columns: 1fr; } }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .form-grid-3 { grid-template-columns: 1fr; } }
+
+    .section-card { margin-bottom: 20px; }
+
+    /* Scroll-spy sections */
+    .profile-section { scroll-margin-top: 80px; }
+  </style>
 </head>
-<body>
+<body data-page="profile">
   <div id="topNav"></div>
+
   <main class="container py-4">
-    <h1 class="h3 mb-3">Profile</h1>
+    <div class="page-header">
+      <h1>Profile</h1>
+    </div>
+
     <div id="profileAlert"></div>
 
-    <section class="card shadow-sm border-0 mb-4">
-      <div class="card-header bg-white"><h2 class="h5 mb-0">Profile Details</h2></div>
-      <div class="card-body">
-        <form id="profileForm" class="row g-3" enctype="multipart/form-data">
-          <div class="col-md-6"><label class="form-label" for="email">Email</label><input id="email" class="form-control" type="email" disabled></div>
-          <div class="col-md-6"><label class="form-label" for="role">Role</label><input id="role" class="form-control" type="text" disabled></div>
-          <div class="col-md-6"><label class="form-label" for="full_name">Full Name</label><input id="full_name" name="full_name" class="form-control" type="text"></div>
-          <div class="col-md-6"><label class="form-label" for="phone">Phone</label><input id="phone" name="phone" class="form-control" type="text"></div>
-
-          <div id="jobSeekerFields" class="col-12 rounded-3 p-3 border seeker-employer-box">
-            <div class="row g-3">
-              <div class="col-md-6"><label class="form-label" for="skills">Skills</label><input id="skills" name="skills" class="form-control" type="text"></div>
-              <div class="col-md-3"><label class="form-label" for="experience_years">Experience Years</label><input id="experience_years" name="experience_years" class="form-control" type="number" min="0"></div>
-              <div class="col-md-3"><label class="form-label" for="education">Education</label><input id="education" name="education" class="form-control" type="text"></div>
-              <div class="col-md-8"><label class="form-label" for="bio">Bio</label><textarea id="bio" name="bio" class="form-control" rows="4"></textarea></div>
-              <div class="col-md-4"><label class="form-label">Resume</label><input name="resume" class="form-control" type="file" accept=".pdf,.doc,.docx"></div>
-              <div class="col-md-4"><label class="form-label">Profile Picture</label><input name="profile_picture" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif"></div>
-            </div>
+    <div class="profile-layout">
+      <!-- Sidebar -->
+      <aside class="profile-sidebar">
+        <div class="card">
+          <div class="avatar-section">
+            <div class="avatar" id="avatarEl">?</div>
+            <div class="avatar-name" id="avatarName">—</div>
+            <div class="avatar-role badge" id="avatarRole" style="margin-top:6px">—</div>
           </div>
+          <nav class="sidebar-nav">
+            <a href="#section-basic" class="active">Basic Info</a>
+            <a href="#section-pro" id="seekerNav">Professional</a>
+            <a href="#section-company" id="employerNav" style="display:none">Company</a>
+            <a href="#section-password">Security</a>
+          </nav>
+        </div>
+      </aside>
 
-          <div id="employerFields" class="col-12 rounded-3 p-3 border seeker-employer-box">
-            <div class="row g-3">
-              <div class="col-md-6"><label class="form-label" for="company_name">Company Name</label><input id="company_name" name="company_name" class="form-control" type="text"></div>
-              <div class="col-md-6"><label class="form-label" for="company_website">Company Website</label><input id="company_website" name="company_website" class="form-control" type="url"></div>
-              <div class="col-md-8"><label class="form-label" for="company_description">Company Description</label><textarea id="company_description" name="company_description" class="form-control" rows="4"></textarea></div>
-              <div class="col-md-4"><label class="form-label">Company Logo</label><input name="company_logo" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif"></div>
+      <!-- Main content -->
+      <div>
+        <form id="profileForm" enctype="multipart/form-data">
+
+          <!-- Basic Info -->
+          <section class="card section-card profile-section" id="section-basic">
+            <div class="card-header"><h2>Basic Information</h2></div>
+            <div class="card-body">
+              <div class="form-grid-2 mb-3">
+                <div class="form-group">
+                  <label class="lbl" for="email">Email</label>
+                  <input id="email" class="input" type="email" disabled>
+                </div>
+                <div class="form-group">
+                  <label class="lbl" for="role">Role</label>
+                  <input id="role" class="input" type="text" disabled>
+                </div>
+              </div>
+              <div class="form-grid-2 mb-3">
+                <div class="form-group">
+                  <label class="lbl" for="full_name">Full Name</label>
+                  <input id="full_name" name="full_name" class="input" type="text" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                  <label class="lbl" for="phone">Phone</label>
+                  <input id="phone" name="phone" class="input" type="text" placeholder="+1 555 000 0000">
+                </div>
+              </div>
+              <div class="flex" style="justify-content:flex-end">
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+              </div>
             </div>
+          </section>
+
+          <!-- Job Seeker -->
+          <section class="card section-card profile-section hidden" id="section-pro" data-role="job_seeker">
+            <div class="card-header"><h2>Professional Info</h2></div>
+            <div class="card-body">
+              <div class="form-grid-3 mb-3">
+                <div class="form-group" style="grid-column:1/-1">
+                  <label class="lbl" for="skills">Skills</label>
+                  <input id="skills" name="skills" class="input" type="text" placeholder="e.g. Python, React, SQL">
+                </div>
+                <div class="form-group">
+                  <label class="lbl" for="experience_years">Experience (years)</label>
+                  <input id="experience_years" name="experience_years" class="input" type="number" min="0">
+                </div>
+                <div class="form-group">
+                  <label class="lbl" for="education">Education</label>
+                  <input id="education" name="education" class="input" type="text" placeholder="B.Sc Computer Science">
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="lbl" for="bio">Bio</label>
+                <textarea id="bio" name="bio" class="input" rows="4" placeholder="Tell employers about yourself…"></textarea>
+              </div>
+              <div class="form-grid-2 mb-3">
+                <div class="form-group">
+                  <label class="lbl">Resume (PDF, DOC, DOCX)</label>
+                  <input name="resume" class="input input-file" type="file" accept=".pdf,.doc,.docx">
+                </div>
+                <div class="form-group">
+                  <label class="lbl">Profile Picture</label>
+                  <input name="profile_picture" class="input input-file" type="file" accept=".jpg,.jpeg,.png,.gif" id="profilePicInput">
+                </div>
+              </div>
+              <div class="flex" style="justify-content:flex-end">
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Employer -->
+          <section class="card section-card profile-section hidden" id="section-company" data-role="employer">
+            <div class="card-header"><h2>Company Info</h2></div>
+            <div class="card-body">
+              <div class="form-grid-2 mb-3">
+                <div class="form-group">
+                  <label class="lbl" for="company_name">Company Name</label>
+                  <input id="company_name" name="company_name" class="input" type="text" placeholder="Acme Corp">
+                </div>
+                <div class="form-group">
+                  <label class="lbl" for="company_website">Company Website</label>
+                  <input id="company_website" name="company_website" class="input" type="url" placeholder="https://acme.com">
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="lbl" for="company_description">Company Description</label>
+                <textarea id="company_description" name="company_description" class="input" rows="4" placeholder="What does your company do?"></textarea>
+              </div>
+              <div class="form-group mb-3">
+                <label class="lbl">Company Logo</label>
+                <input name="company_logo" class="input input-file" type="file" accept=".jpg,.jpeg,.png,.gif">
+              </div>
+              <div class="flex" style="justify-content:flex-end">
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+              </div>
+            </div>
+          </section>
+
+        </form>
+
+        <!-- Password section (separate form) -->
+        <section class="card section-card profile-section" id="section-password">
+          <div class="card-header"><h2>Change Password</h2></div>
+          <div class="card-body">
+            <div id="passwordAlert"></div>
+            <form id="passwordForm">
+              <div class="form-grid-2 mb-4">
+                <div class="form-group">
+                  <label class="lbl">Current Password</label>
+                  <input name="current_password" class="input" type="password" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                  <label class="lbl">New Password</label>
+                  <input name="new_password" class="input" type="password" placeholder="Min 4 characters" minlength="4" required>
+                </div>
+              </div>
+              <button class="btn btn-primary" type="submit">Update Password</button>
+            </form>
           </div>
-
-          <div class="col-12 d-grid d-md-flex"><button class="btn btn-primary" type="submit">Update Profile</button></div>
-        </form>
+        </section>
       </div>
-    </section>
-
-    <section class="card shadow-sm border-0">
-      <div class="card-header bg-white"><h2 class="h5 mb-0">Change Password</h2></div>
-      <div class="card-body">
-        <div id="passwordAlert"></div>
-        <form id="passwordForm" class="row g-3">
-          <div class="col-md-6"><label class="form-label">Current Password</label><input name="current_password" class="form-control" type="password" required></div>
-          <div class="col-md-6"><label class="form-label">New Password</label><input name="new_password" class="form-control" type="password" minlength="4" required></div>
-          <div class="col-12 d-grid d-md-flex"><button class="btn btn-primary" type="submit">Change Password</button></div>
-        </form>
-      </div>
-    </section>
+    </div>
   </main>
-  <script src="../assets/js/jquery.min.js"></script>
+
+  <script src="portal-common.js"></script>
   <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/common.js"></script>
+  <script>
+    // Sidebar smooth scroll + active
+    document.querySelectorAll('.sidebar-nav a').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelectorAll('.sidebar-nav a').forEach(x => x.classList.remove('active'));
+        a.classList.add('active');
+      });
+    });
+
+    // Avatar update preview
+    document.getElementById('profilePicInput')?.addEventListener('change', function() {
+      if (this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const av = document.getElementById('avatarEl');
+          av.innerHTML = `<img src="${e.target.result}" alt="Profile">`;
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+
+    // Show/hide role-specific sections based on user role
+    function applyRole(role) {
+      document.querySelectorAll('[data-role]').forEach(el => {
+        const match = el.dataset.role === role;
+        el.classList.toggle('hidden', !match);
+      });
+      document.getElementById('employerNav').style.display = role === 'employer' ? '' : 'none';
+      document.getElementById('seekerNav').style.display = role === 'job_seeker' ? '' : 'none';
+    }
+
+    const user = getUser();
+    if (user) {
+      document.getElementById('avatarEl').textContent = (user.full_name || user.email || '?')[0].toUpperCase();
+      document.getElementById('avatarName').textContent = user.full_name || user.email || '—';
+      document.getElementById('avatarRole').textContent = user.role === 'employer' ? 'Employer' : 'Job Seeker';
+      applyRole(user.role);
+    }
+  </script>
   <script src="../assets/js/profile.js"></script>
 </body>
 </html>
