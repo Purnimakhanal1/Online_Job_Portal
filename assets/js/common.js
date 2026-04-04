@@ -155,6 +155,8 @@
   function renderNav() {
     var host = document.getElementById('topNav');
     if (!host) return;
+    // Skip if portal-common.js already rendered the nav (portal.css pages)
+    if (host.querySelector('.portal-nav')) return;
     host.innerHTML = navTemplate();
     var btn = document.getElementById('logoutBtn');
     if (btn) {
