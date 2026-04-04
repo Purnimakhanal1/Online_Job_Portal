@@ -42,86 +42,8 @@
   </main>
 
   <script src="portal-common.js"></script>
+  <script src="../assets/js/common.js"></script>
   <script src="../assets/js/api.js"></script>
-  <script>
-    async function loadJobDetails() {
-      const params = new URLSearchParams(location.search);
-      const id = params.get('id');
-      if (!id) { showAlert('detailsAlert', 'No job ID specified.'); return; }
-
-      document.getElementById('jobDetails').innerHTML = `
-        <div class="details-layout">
-          <div>
-            <div class="skeleton mb-3" style="height:36px;width:60%"></div>
-            <div class="skeleton mb-4" style="height:18px;width:35%"></div>
-            <div class="flex gap-2 mb-4">${Array(3).fill('<div class="skeleton" style="height:24px;width:80px;border-radius:100px"></div>').join('')}</div>
-            <div class="skeleton mb-2" style="height:15px;width:100%"></div>
-            <div class="skeleton mb-2" style="height:15px;width:95%"></div>
-            <div class="skeleton mb-2" style="height:15px;width:88%"></div>
-          </div>
-          <div class="card"><div class="card-body"><div class="skeleton" style="height:48px;border-radius:8px"></div></div></div>
-        </div>`;
-
-      try {
-        // Replace: const job = await api.getJob(id);
-        const job = null; // placeholder
-        if (!job) throw new Error('not found');
-        renderJob(job);
-      } catch {
-        showAlert('detailsAlert', 'Job not found or could not be loaded.', 'error');
-        document.getElementById('jobDetails').innerHTML = '';
-      }
-    }
-
-    function renderJob(job) {
-      const salary = formatSalary(job.salary_min, job.salary_max, job.salary_currency);
-      const user = getUser();
-      const canApply = user && user.role === 'job_seeker';
-
-      document.title = `${job.title} — JobPortal`;
-
-      document.getElementById('jobDetails').innerHTML = `
-        <div class="details-layout">
-          <div>
-            <div class="job-detail-title">${job.title}</div>
-            <div class="job-detail-company">${job.employer_name || job.company_name || 'Company'}</div>
-            <div class="flex flex-wrap gap-2 mb-4">
-              ${job.job_type ? `<span class="badge">${formatJobType(job.job_type)}</span>` : ''}
-              ${job.location ? `<span class="badge badge-gray">📍 ${job.location}</span>` : ''}
-              ${salary ? `<span class="badge badge-green">💰 ${salary}</span>` : ''}
-              ${statusBadge(job.status)}
-            </div>
-            <div class="divider"></div>
-            ${job.description ? `<div class="detail-section"><h3>Description</h3><p>${job.description}</p></div>` : ''}
-            ${job.requirements ? `<div class="detail-section"><h3>Requirements</h3><ul>${job.requirements.split('\n').filter(Boolean).map(r=>`<li>${r}</li>`).join('')}</ul></div>` : ''}
-            ${job.responsibilities ? `<div class="detail-section"><h3>Responsibilities</h3><ul>${job.responsibilities.split('\n').filter(Boolean).map(r=>`<li>${r}</li>`).join('')}</ul></div>` : ''}
-            ${job.skills_required ? `<div class="detail-section"><h3>Skills Required</h3><div class="flex flex-wrap gap-2">${job.skills_required.split(',').map(s=>`<span class="badge badge-gray">${s.trim()}</span>`).join('')}</div></div>` : ''}
-          </div>
-
-          <div class="sticky-sidebar">
-            <div class="card mb-3">
-              <div class="card-body">
-                <div class="meta-list mb-4">
-                  ${job.experience_required != null ? `<div class="meta-item"><span class="meta-icon">⏱</span><div><div class="meta-label">Experience</div><div class="meta-val">${job.experience_required}+ years</div></div></div>` : ''}
-                  ${job.education_required ? `<div class="meta-item"><span class="meta-icon">🎓</span><div><div class="meta-label">Education</div><div class="meta-val">${job.education_required}</div></div></div>` : ''}
-                  ${job.positions_available ? `<div class="meta-item"><span class="meta-icon">👥</span><div><div class="meta-label">Openings</div><div class="meta-val">${job.positions_available}</div></div></div>` : ''}
-                  ${job.application_deadline ? `<div class="meta-item"><span class="meta-icon">📅</span><div><div class="meta-label">Deadline</div><div class="meta-val">${new Date(job.application_deadline).toLocaleDateString()}</div></div></div>` : ''}
-                  <div class="meta-item"><span class="meta-icon">🕐</span><div><div class="meta-label">Posted</div><div class="meta-val">${timeAgo(job.created_at)}</div></div></div>
-                </div>
-                ${canApply
-                  ? `<a href="apply.html?id=${job.id}" class="btn btn-primary btn-block">Apply Now →</a>`
-                  : !user
-                    ? `<a href="login.html" class="btn btn-ghost btn-block">Login to Apply</a>`
-                    : `<div class="text-sm text-muted text-center">You posted this job</div>`
-                }
-              </div>
-            </div>
-            <a href="jobs.html" class="btn btn-ghost btn-block btn-sm">← All Jobs</a>
-          </div>
-        </div>`;
-    }
-
-    loadJobDetails();
-  </script>
+  <script src="../assets/js/jobs.js"></script>
 </body>
 </html>
