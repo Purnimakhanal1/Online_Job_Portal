@@ -1,0 +1,86 @@
+ONLINE WEB PORTAL - GROUP WORK DIVISION
+
+
+Team Member 1 - Frontend
+Work completed:
+- Built the main landing page and homepage layout.
+- Created the role-based hero sections for guest, job seeker, employer, and admin users.
+- Added featured job cards and homepage statistics.
+- Connected the homepage to the shared navigation and API-driven job data.
+
+Main files handled:
+- frontend/index.html
+- frontend/portal-common.js
+- assets/js/common.js
+- assets/js/jobs.js
+
+Team Member 2 - Frontend
+Work completed:
+- Designed and styled the authentication and user interface pages.
+- Built the login and register page layouts.
+- Created the job browsing, job details, apply, dashboard, and profile page interfaces.
+- Added responsive design and shared visual styling across the portal.
+
+Main files handled:
+- frontend/login.html
+- frontend/register.html
+- frontend/jobs.html
+- frontend/jobs_details.html
+- frontend/apply.html
+- frontend/dashboard.html
+- frontend/profile.html
+- assets/css/style.css
+- assets/css/auth.css
+- assets/css/jobs.css
+- frontend/portal.css
+- assets/js/auth.js
+- assets/js/profile.js
+- assets/js/dashboard.js
+
+Team Member 3 - Backend
+Work completed:
+- Set up the PHP database connection and core backend configuration.
+- Added response helpers, file upload handling, session setup, and security support.
+- Implemented authentication endpoints for login, register, and logout.
+- Created user profile and password management APIs.
+
+Main files handled:
+- backend/config/db.php
+- backend/config/response.php
+- backend/config/storage.php
+- backend/auth/login.php
+- backend/auth/register.php
+- backend/auth/logout.php
+- backend/users/profile.php
+- backend/users/update_profile.php
+- backend/users/change_password.php
+
+Team Member 4 - Backend
+Work completed:
+- Built the jobs management APIs for creating, fetching, updating, and deleting jobs.
+- Implemented application submission, application listing, status updates, and withdrawal.
+- Added admin tools for viewing users, jobs, and platform statistics.
+- Designed the PostgreSQL schema, sample data, triggers, and indexes.
+
+Main files handled:
+- backend/jobs/create_job.php
+- backend/jobs/fetch_jobs.php
+- backend/jobs/job_details.php
+- backend/jobs/update_job.php
+- backend/jobs/delete_job.php
+- backend/applications/apply.php
+- backend/applications/my_applications.php
+- backend/applications/update_status.php
+- backend/applications/withdraw.php
+- backend/admin/stats.php
+- backend/admin/users.php
+- backend/admin/jobs.php
+- backend/admin/toggle_user.php
+- backend/admin/toggle_job.php
+- database/job_portal.sql
+
+Short Summary:
+The frontend team handled the user interface, page structure, styling, and client-side behavior.
+
+The backend team handled PHP APIs, database connection, uploads, authentication, job management,
+applications, and admin controls.

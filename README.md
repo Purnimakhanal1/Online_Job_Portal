@@ -1,8 +1,10 @@
 # Online Job Portal
 
-A simple job portal built with static frontend pages, a PHP backend, and PostgreSQL. This version is meant to run locally on Apache/XAMPP and stores uploaded files on the local filesystem.
+A simple job portal built with static frontend pages, a PHP backend, and PostgreSQL. This version is meant to run locally on Apache/XAMPP and stores uploaded files on the local filesystem.It supports job seekers, employers, and admins. Users can register, log in, browse jobs, apply for jobs,
+manage profiles, and administer platform data through backend APIs and database tables.
 
 It supports three roles:
+
 - `job_seeker` can browse jobs and apply
 - `employer` can post jobs and manage applications
 - `admin` can view platform stats, review all users, and moderate jobs
@@ -32,8 +34,8 @@ OnlineWebPortal/
 │   └── logs/
 ├── database/
 │   └── job_portal.sql
-├── LICENSE
-└── README.md
+├── README.md
+└── PROJECT_DOCUMENTATION.md
 ```
 
 ## Local Setup
