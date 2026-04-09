@@ -118,6 +118,9 @@
     getJobs: function (query) {
       return request('jobs/fetch_jobs.php', { query: query });
     },
+    getMyJobs: function (query) {
+      return request('jobs/my_jobs.php', { query: query });
+    },
     getAdminJobs: function (query) {
       return request('admin/jobs.php', { query: query });
     },
@@ -132,6 +135,9 @@
     },
     updateAdminUserStatus: function (payload) {
       return request('admin/toggle_user.php', { method: 'PUT', body: payload });
+    },
+    deleteAdminUser: function (id) {
+      return request('admin/delete_user.php', { method: 'DELETE', query: { id: id } });
     },
     getJobDetails: function (id) {
       return request('jobs/job_details.php', { query: { id: id } });

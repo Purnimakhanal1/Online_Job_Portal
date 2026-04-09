@@ -41,27 +41,27 @@
   }
 
   function loadEmployerJobs() {
-    JobPortalAPI.getJobs({ page: 1, limit: 50 }).then(function (res) {
-      var user = JobPortalCommon.getUser();
-      var owned = (res.data || []).filter(function (job) {
-        return Number(job.employer_id) === Number(user.id);
-      });
+    JobPortalAPI.getMyJobs({ page: 1, limit: 50 }).then(function (res) {
+      var jobs = res.data || [];
       
       // Update stats for employer
       updateStats({
-        'Posted Jobs': owned.length,
-        'Active': owned.filter(function(j) { return j.is_active; }).length,
-        'Closed': owned.filter(function(j) { return !j.is_active; }).length,
-        'Total Views': '—'
+        'Posted Jobs': jobs.length,
+        'Active': jobs.filter(function(j) { return j.is_active && !j.is_filled; }).length,
+        'Filled': jobs.filter(function(j) { return j.is_filled; }).length,
+        'Inactive': jobs.filter(function(j) { return !j.is_active; }).length
       });
       
       var host = document.getElementById('jobsPanel');
-      if (!owned.length) {
+      if (!jobs.length) {
         host.innerHTML = '<p class="muted">No jobs posted yet.</p>';
         return;
       }
-      host.innerHTML = owned.map(function (job) {
-        return '<div class="row-card"><div><strong>' + JobPortalCommon.escapeHtml(job.title) + '</strong><p class="text-secondary mb-0">' + JobPortalCommon.escapeHtml(job.location || '-') + '</p></div>'
+      host.innerHTML = jobs.map(function (job) {
+        var filledBadge = job.is_filled ? '<span class="status-pill inactive ms-1">Filled</span>' : '';
+        var activeBadge = statusPill(job.is_active);
+        var posInfo = '(' + String(job.accepted_count || 0) + '/' + String(job.positions_available || 1) + ' positions filled)';
+        return '<div class="row-card"><div><strong>' + JobPortalCommon.escapeHtml(job.title) + '</strong>' + activeBadge + filledBadge + '<p class="text-secondary mb-0">' + JobPortalCommon.escapeHtml(job.location || '-') + ' | ' + posInfo + '</p></div>'
           + '<div class="row-actions"><button class="btn btn-outline-danger btn-sm" data-delete-job="' + job.id + '">Delete</button></div></div>';
       }).join('');
 
@@ -203,13 +203,15 @@
             meta.push('Deadline: ' + JobPortalCommon.formatDate(job.application_deadline));
           }
           meta.push('Applications: ' + String(job.applications_count || 0));
+          meta.push('Positions: ' + String(job.accepted_count || 0) + '/' + String(job.positions_available || 1) + ' filled');
 
           var toggleLabel = job.is_active ? 'Deactivate' : 'Activate';
           var toggleClass = job.is_active ? 'btn-outline-warning' : 'btn-outline-success';
+          var filledBadge = job.is_filled ? ' <span class="status-pill inactive">Filled</span>' : '';
 
           return '<div class="row-card">'
             + '<div>'
-            + '<div class="row-card-title"><strong>' + JobPortalCommon.escapeHtml(job.title) + '</strong>' + statusPill(job.is_active) + '</div>'
+            + '<div class="row-card-title"><strong>' + JobPortalCommon.escapeHtml(job.title) + '</strong>' + statusPill(job.is_active) + filledBadge + '</div>'
             + rowMeta(meta)
             + '</div>'
             + '<div class="row-actions">'
@@ -288,6 +290,7 @@
             var buttonLabel = user.is_active ? 'Deactivate' : 'Activate';
             var buttonClass = user.is_active ? 'btn-outline-warning' : 'btn-outline-success';
             action = '<button class="btn ' + buttonClass + ' btn-sm" data-toggle-user="' + user.id + '" data-next-active="' + (nextActive ? '1' : '0') + '">' + buttonLabel + '</button>';
+            action += ' <button class="btn btn-outline-danger btn-sm" data-delete-user="' + user.id + '">Delete</button>';
           }
 
           return '<div class="row-card">'
@@ -313,6 +316,21 @@
             }).catch(function (err) {
               JobPortalCommon.showAlert('#dashboardAlert', err.message || 'Unable to update user status', 'danger');
             });
+          });
+        });
+
+        host.querySelectorAll('[data-delete-user]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            if (!confirm('Are you sure you want to permanently delete this user? This cannot be undone.')) return;
+            JobPortalAPI.deleteAdminUser(btn.getAttribute('data-delete-user'))
+              .then(function () {
+                loadAdminStats();
+                loadAdminUsers();
+                JobPortalCommon.showAlert('#dashboardAlert', 'User deleted successfully', 'success');
+              })
+              .catch(function (err) {
+                JobPortalCommon.showAlert('#dashboardAlert', err.message || 'Delete failed', 'danger');
+              });
           });
         });
       })
